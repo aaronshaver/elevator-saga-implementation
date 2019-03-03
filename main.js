@@ -23,6 +23,7 @@
 
         elevator.on("idle", function() {
             var pressedFloors = elevator.getPressedFloors();
+// TODO: hint from friend: the pressed floors are sorted... which sucks
 
             if(pressedFloors.length == 0) {
                 if(originsOfRequests.length > 0) {
@@ -33,9 +34,6 @@
                     var filteredArray = originsOfRequests.filter(e => e !== floorNum);
                     originsOfRequests = filteredArray;
                 }
-
-                // do the default, dumb moving behavior when there are no passengers and no requests from other floors
-                defaultMovement();
             }
             else {
                 // there are pressed floors (passengers in elevator), so move to first pressed floor in the array
@@ -43,17 +41,6 @@
             }
 
         });
-
-        function defaultMovement() {
-            // if current floor isn't top floor go up; otherwise, go to ground floor
-            var currentFloor = elevator.currentFloor()
-            if(currentFloor < topFloor) {
-                elevator.goToFloor(currentFloor + 1)
-            }
-            else {
-                elevator.goToFloor(0)
-            }
-        }
 
         function printOriginsOfRequests() {
             console.log('origin of request floors: ' + originsOfRequests); 
@@ -79,7 +66,7 @@
             elevator = elevators[0];
             console.log('----------------------------------------------------------');
             var output = '';
-            output += 'pressed floors: ' + elevator.getPressedFloors().length + ' | ';
+            output += 'pressed floors: ' + elevator.getPressedFloors().toString() + ' | ';
             output += 'current floor: ' + elevator.currentFloor() + ' | ';
             output += 'load: ' + elevator.loadFactor() + ' | ';
             console.log(output);
