@@ -14,35 +14,36 @@
             floor.on("down_button_pressed", function() {
                 upDownPressRequests.push(floorNum);
             });
-
         });
-        
+
         // Whenever the elevator is idle (has no more queued destinations)
         elevator.on("idle", function() {
             var pressedFloors = elevator.getPressedFloors();
-            if (pressedFloors.includes(0)) {
-                elevator.goToFloor(0);
-            }
-            else if (pressedFloors.includes(1)) {
-                elevator.goToFloor(1);
-            }
-            else  if (pressedFloors.includes(2)) {
-                elevator.goToFloor(2);
-            }
-            else if (pressedFloors.includes(3)) {
-                elevator.goToFloor(3);
-            }
-            else if (pressedFloors.includes(4)) {
-                elevator.goToFloor(4);
+            var currentFloor = elevator.currentFloor();
+            if (pressedFloors.length == 0) {
+                var nextFloor = currentFloor + 1;
+                if (nextFloor == floors.length) {
+                    nextFloor = 0;
+                }
+                elevator.goToFloor(nextFloor);              
             }
             else {
-                elevator.goToFloor(0);
+                var nextFloor = getClosestFloor(currentFloor, pressedFloors);
+                elevator.goToFloor(nextFloor);
             }
         });
-        
-        elevator.
+
+        function getClosestFloor(currentFloor, pressedFloors) {
+            var closestFloor = 1000;
+            pressedFloors.forEach(function(floor) {
+                if (Math.abs(currentFloor - floor) < Math.abs(closestFloor - floor)) {
+                   closestFloor = floor;
+                }
+            });
+            return closestFloor;
+        }
+
     },
     update: function(dt, elevators, floors) {
-        // We normally don't need to do anything here
     }
 }
