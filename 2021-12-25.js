@@ -17,6 +17,14 @@
             });
         });
 
+        elevator.on("passing_floor", function(floor, direction) {
+            if (upDownPressRequests.includes(floor) && direction === elevator.destinationDirection()) {
+                elevator.destinationQueue.unshift(floor);
+                upDownPressRequests = upDownPressRequests.filter(e => e !== floor); // remove floor we're headed to
+                elevator.checkDestinationQueue();
+            }
+        });
+                                                                    
         // Whenever the elevator is idle (has no more queued destinations)
         elevator.on("idle", function() {
             var pressedFloors = elevator.getPressedFloors();
@@ -45,7 +53,7 @@
         }
         
         function wrappedGoToFloor(nextFloor, elevator) {
-            upDownPressRequests = upDownPressRequests.filter(e => e !== nextFloor); // remove floor we're headed to next
+            upDownPressRequests = upDownPressRequests.filter(e => e !== nextFloor); // remove floor we're headed to
             elevator.goToFloor(nextFloor);
         }
 
