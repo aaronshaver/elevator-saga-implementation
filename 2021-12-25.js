@@ -33,15 +33,6 @@
                     elevator.goToFloor(elevator.currentFloor()); // workaround because idle is not called repeatedly, only once
                 }
             });
-            
-            elevator.on("passing_floor", function(floor, direction) {
-                if (upDownPressRequests.includes(floor) && direction === elevator.destinationDirection()) {
-                    elevator.destinationQueue.unshift(floor);
-                    upDownPressRequests = upDownPressRequests.filter(e => e !== floor); // remove floor we're headed to
-                    elevator.checkDestinationQueue();
-                }
-            });
-
         });
 
         function getClosestFloor(currentFloor, pressedFloors) {
