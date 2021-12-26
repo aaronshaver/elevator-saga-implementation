@@ -20,16 +20,19 @@
         elevator.on("idle", function() {
             var pressedFloors = elevator.getPressedFloors();
             var currentFloor = elevator.currentFloor();
-            if (pressedFloors.length == 0) {
+            if (pressedFloors.length == 0 && upDownPressRequests.length == 0) {
                 var nextFloor = currentFloor + 1;
                 if (nextFloor == floors.length) {
                     nextFloor = 0;
                 }
-                elevator.goToFloor(nextFloor);              
+                wrappedGoToFloor(nextFloor);
+            }
+            else if (pressedFloors.length > 0) {
+                var nextFloor = getClosestFloor(currentFloor, pressedFloors);
+                wrappedGoToFloor(nextFloor);
             }
             else {
-                var nextFloor = getClosestFloor(currentFloor, pressedFloors);
-                elevator.goToFloor(nextFloor);
+                wrappedGoToFloor(upDownPressRequests[0]);
             }
         });
 
@@ -37,13 +40,18 @@
             var closestFloor = 1000;
             pressedFloors.forEach(function(floor) {
                 if (Math.abs(currentFloor - floor) < Math.abs(closestFloor - floor)) {
-                   closestFloor = floor;
+                    closestFloor = floor;
                 }
             });
             return closestFloor;
         }
+        
+        function wrappedGoToFloor(nextFloor) {
+            upDownPressRequests = upDownPressRequests.filter(e => e !== nextFloor); // remove floor we're headed to next
+            elevator.goToFloor(nextFloor);
+        }
 
     },
-    update: function(dt, elevators, floors) {
-    }
+        update: function(dt, elevators, floors) {
+        }
 }
