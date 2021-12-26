@@ -34,7 +34,7 @@
         function getClosestFloor(currentFloor, pressedFloors) {
             var closestFloor = 1000;
             pressedFloors.forEach(function(floor) {
-                if (Math.abs(currentFloor - floor) < Math.abs(closestFloor - floor)) {
+                if (Math.abs(currentFloor - floor) < Math.abs(currentFloor - closestFloor)) {
                     closestFloor = floor;
                 }
             });
