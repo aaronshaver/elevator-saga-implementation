@@ -24,10 +24,13 @@
 
             if (pressedFloors.length > 0) {
                 var nextFloor = getClosestFloor(currentFloor, pressedFloors);
-                wrappedGoToFloor(nextFloor);
+                wrappedGoToFloor(nextFloor, elevator);
             }
             else if (upDownPressRequests.length > 0) {
-                wrappedGoToFloor(upDownPressRequests[0]);
+                wrappedGoToFloor(upDownPressRequests[0], elevator);
+            }
+            else {
+                elevator.goToFloor(elevator.currentFloor()); // workaround because idle is not called repeatedly, only once
             }
         });
 
@@ -41,7 +44,7 @@
             return closestFloor;
         }
         
-        function wrappedGoToFloor(nextFloor) {
+        function wrappedGoToFloor(nextFloor, elevator) {
             upDownPressRequests = upDownPressRequests.filter(e => e !== nextFloor); // remove floor we're headed to next
             elevator.goToFloor(nextFloor);
         }
