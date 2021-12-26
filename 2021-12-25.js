@@ -16,30 +16,32 @@
                 upDownPressRequests.push(floorNum);
             });
         });
+        
+        elevators.forEach(function(elevator) {
+            elevator.on("idle", function() {
+                var pressedFloors = elevator.getPressedFloors();
+                var currentFloor = elevator.currentFloor();
 
-        elevator.on("passing_floor", function(floor, direction) {
-            if (upDownPressRequests.includes(floor) && direction === elevator.destinationDirection()) {
-                elevator.destinationQueue.unshift(floor);
-                upDownPressRequests = upDownPressRequests.filter(e => e !== floor); // remove floor we're headed to
-                elevator.checkDestinationQueue();
-            }
-        });
-                                                                    
-        // Whenever the elevator is idle (has no more queued destinations)
-        elevator.on("idle", function() {
-            var pressedFloors = elevator.getPressedFloors();
-            var currentFloor = elevator.currentFloor();
+                if (pressedFloors.length > 0) {
+                    var nextFloor = getClosestFloor(currentFloor, pressedFloors);
+                    wrappedGoToFloor(nextFloor, elevator);
+                }
+                else if (upDownPressRequests.length > 0) {
+                    wrappedGoToFloor(upDownPressRequests[0], elevator);
+                }
+                else {
+                    elevator.goToFloor(elevator.currentFloor()); // workaround because idle is not called repeatedly, only once
+                }
+            });
+            
+            elevator.on("passing_floor", function(floor, direction) {
+                if (upDownPressRequests.includes(floor) && direction === elevator.destinationDirection()) {
+                    elevator.destinationQueue.unshift(floor);
+                    upDownPressRequests = upDownPressRequests.filter(e => e !== floor); // remove floor we're headed to
+                    elevator.checkDestinationQueue();
+                }
+            });
 
-            if (pressedFloors.length > 0) {
-                var nextFloor = getClosestFloor(currentFloor, pressedFloors);
-                wrappedGoToFloor(nextFloor, elevator);
-            }
-            else if (upDownPressRequests.length > 0) {
-                wrappedGoToFloor(upDownPressRequests[0], elevator);
-            }
-            else {
-                elevator.goToFloor(elevator.currentFloor()); // workaround because idle is not called repeatedly, only once
-            }
         });
 
         function getClosestFloor(currentFloor, pressedFloors) {
